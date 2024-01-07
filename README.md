@@ -4,10 +4,16 @@
 # {ROGRSQL}
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/brownag/ROGRSQL/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brownag/ROGRSQL/actions/workflows/R-CMD-check.yaml)
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/license/MIT/)
+[![ROGRSQL
+Manual](https://img.shields.io/badge/docs-HTML-informational)](https://humus.rocks/ROGRSQL/)
 <!-- badges: end -->
 
 The goal of {ROGRSQL} is to provide a basic proof-of-concept for limited
-DBI-compatibile queries with the [Geospatial Data Abstraction Library
+DBI-compatible queries with the [Geospatial Data Abstraction Library
 (GDAL)](https://gdal.org/)
 [‘OGRSQL’](https://gdal.org/user/ogr_sql_dialect.html) dialect.
 
@@ -28,14 +34,11 @@ The shapefile is written to a new GeoPackage, and the GeoPackage is used
 as the data source which is queried using GDAL OGRSQL.
 
 ``` r
-library(terra)
-#> terra 1.7.65
 library(ROGRSQL)
 
-path <- system.file("ex", "lux.shp", package = "terra")
-writeVector(vect(path), "lux.gpkg", overwrite = TRUE)
+path <- system.file("extdata", "lux.gpkg", package = "ROGRSQL")
 
-db <- dbConnect(ROGRSQL::OGRSQL(), "lux.gpkg")
+db <- dbConnect(ROGRSQL::OGRSQL(), path)
 dbGetQuery(db, "SELECT ST_Centroid(geom) FROM lux LIMIT 2")
 #>                           ST_Centroid(geom)
 #> 1  POINT (6.0090815315983 50.0706361949086)
@@ -46,7 +49,7 @@ We can make more complex queries, but there are limitations in OGRSQL
 with the way that geometries versus attributes are interpreted.
 
 ``` r
-db <- dbConnect(ROGRSQL::OGRSQL(), "lux.gpkg")
+db <- dbConnect(ROGRSQL::OGRSQL(), path)
 dbGetQuery(db, "SELECT ST_Centroid(geom), ST_ConvexHull(geom) FROM lux LIMIT 2")
 #>                           ST_Centroid(geom) ST_ConvexHull(geom)
 #> 1  POINT (6.0090815315983 50.0706361949086)        00, 01, ....
@@ -65,7 +68,7 @@ results in the RStudio SQL editor. This simply requires using a special
 comment at the top of your SQL script, like so:
 
 ``` sql
--- !preview connection=DBI::dbConnect(ROGRSQL::OGRSQL(), "lux.gpkg")
+-- !preview connection=DBI::dbConnect(ROGRSQL::OGRSQL(), system.file("extdata", "lux.gpkg", package = "ROGRSQL"))
 
 SELECT ST_Centroid(geom) FROM lux LIMIT 1;
 ```
@@ -81,7 +84,7 @@ SELECT ST_Centroid(geom) FROM lux LIMIT 1;
 </div>
 
 In an {rmarkdown} code chunk, you can similarly do:
-`--| connection=DBI::dbConnect(ROGRSQL::OGRSQL(), "lux.gpkg")`.
+`--| connection=DBI::dbConnect(ROGRSQL::OGRSQL(),  "inst/extdata/lux.gpkg")`.
 
 # Constructing OGRSQL Queries with {dbplyr}
 
@@ -104,8 +107,8 @@ library(ROGRSQL)
 library(dplyr, warn.conflicts = FALSE)
 library(dbplyr, warn.conflicts = FALSE)
 
-db1 <- dbConnect(RSQLite::SQLite(), "lux.gpkg")
-db2 <- dbConnect(ROGRSQL::OGRSQL(), "lux.gpkg")
+db1 <- dbConnect(RSQLite::SQLite(), system.file("extdata", "lux.gpkg", package = "ROGRSQL"))
+db2 <- dbConnect(ROGRSQL::OGRSQL(), system.file("extdata", "lux.gpkg", package = "ROGRSQL"))
 
 # error with ST_Centroid
 tbl(db1, "lux") |> 
@@ -127,8 +130,8 @@ res
 #> Warning: Prior result set will be cleared
 #> Error in `collect()`:
 #> ! Failed to collect lazy table.
-#> Caused by error in `.validate_n()`:
-#> ! n (-1) should be a positive integer with length 1
+#> Caused by error:
+#> ! unable to find an inherited method for function 'dbGetRowCount' for signature '"GDALOGRSQLResult"'
 
 # inspect generated query
 show_query(res)
@@ -157,7 +160,7 @@ DBI-compatible interface tailored to the GDAL OGRSQL dialect. So,
 perhaps there is a space for a package like this, but it is also not
 entirely clear it is “needed”. I will point out that much of the basic
 SQL evaluation/spatial queries etc. can be readily achieved with
-{sf}+{DBI} or {terra}. i
+{sf}+{DBI} or {terra}.
 
 After getting the basics minimally working, and thinking about pushing
 the repo up to GitHub, I realized that folks have tread in this space

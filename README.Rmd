@@ -16,9 +16,12 @@ knitr::opts_chunk$set(
 # {ROGRSQL}
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/brownag/ROGRSQL/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brownag/ROGRSQL/actions/workflows/R-CMD-check.yaml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/license/MIT/)
+[![ROGRSQL Manual](https://img.shields.io/badge/docs-HTML-informational)](https://humus.rocks/ROGRSQL/)
 <!-- badges: end -->
 
-The goal of {ROGRSQL} is to provide a basic proof-of-concept for limited DBI-compatibile queries with the [Geospatial Data Abstraction Library (GDAL)](https://gdal.org/) ['OGRSQL'](https://gdal.org/user/ogr_sql_dialect.html) dialect.
+The goal of {ROGRSQL} is to provide a basic proof-of-concept for limited DBI-compatible queries with the [Geospatial Data Abstraction Library (GDAL)](https://gdal.org/) ['OGRSQL'](https://gdal.org/user/ogr_sql_dialect.html) dialect.
 
 ## Installation
 
@@ -35,20 +38,18 @@ Here is a basic demonstration using a sample dataset from the {terra} package.
 The shapefile is written to a new GeoPackage, and the GeoPackage is used as the data source which is queried using GDAL OGRSQL.
 
 ```{r example-r}
-library(terra)
 library(ROGRSQL)
 
-path <- system.file("ex", "lux.shp", package = "terra")
-writeVector(vect(path), "lux.gpkg", overwrite = TRUE)
+path <- system.file("extdata", "lux.gpkg", package = "ROGRSQL")
 
-db <- dbConnect(ROGRSQL::OGRSQL(), "lux.gpkg")
+db <- dbConnect(ROGRSQL::OGRSQL(), path)
 dbGetQuery(db, "SELECT ST_Centroid(geom) FROM lux LIMIT 2")
 ```
 
 We can make more complex queries, but there are limitations in OGRSQL with the way that geometries versus attributes are interpreted.
 
 ```{r}
-db <- dbConnect(ROGRSQL::OGRSQL(), "lux.gpkg")
+db <- dbConnect(ROGRSQL::OGRSQL(), path)
 dbGetQuery(db, "SELECT ST_Centroid(geom), ST_ConvexHull(geom) FROM lux LIMIT 2")
 ```
 
@@ -59,19 +60,19 @@ Note that in above case two geometry columns are calculated in the result, but o
 You can use the `OGRSQL()` DBI driver to dynamically preview your results in the RStudio SQL editor. This simply requires using a special comment at the top of your SQL script, like so:
 
 ```{sql example-sql, eval=FALSE}
--- !preview connection=DBI::dbConnect(ROGRSQL::OGRSQL(), "lux.gpkg")
+-- !preview connection=DBI::dbConnect(ROGRSQL::OGRSQL(), system.file("extdata", "lux.gpkg", package = "ROGRSQL"))
 
 SELECT ST_Centroid(geom) FROM lux LIMIT 1;
 ```
 
 ```{sql example-sql2, eval=TRUE, echo=FALSE}
---| connection=DBI::dbConnect(ROGRSQL::OGRSQL(), "lux.gpkg")
+--| connection=DBI::dbConnect(ROGRSQL::OGRSQL(), system.file("extdata", "lux.gpkg", package = "ROGRSQL"))
 
 SELECT ST_Centroid(geom) FROM lux LIMIT 1;
 ```
 
 In an {rmarkdown} code chunk, you can similarly do:
- `--| connection=DBI::dbConnect(ROGRSQL::OGRSQL(), "lux.gpkg")`.
+ `--| connection=DBI::dbConnect(ROGRSQL::OGRSQL(),  "inst/extdata/lux.gpkg")`.
 
 # Constructing OGRSQL Queries with {dbplyr}
 
@@ -84,8 +85,8 @@ library(ROGRSQL)
 library(dplyr, warn.conflicts = FALSE)
 library(dbplyr, warn.conflicts = FALSE)
 
-db1 <- dbConnect(RSQLite::SQLite(), "lux.gpkg")
-db2 <- dbConnect(ROGRSQL::OGRSQL(), "lux.gpkg")
+db1 <- dbConnect(RSQLite::SQLite(), system.file("extdata", "lux.gpkg", package = "ROGRSQL"))
+db2 <- dbConnect(ROGRSQL::OGRSQL(), system.file("extdata", "lux.gpkg", package = "ROGRSQL"))
 
 # error with ST_Centroid
 tbl(db1, "lux") |> 
@@ -110,7 +111,6 @@ show_query(res)
 I whipped this up as a proof-of-concept to better understand the workings of the GDAL API (here accessed via the excellent [{vapour}](https://github.com/hypertidy/vapour/) package by @mdsumner), as well as to learn more about developing {DBI}/{dbplyr} backends. 
 
 I was exploring this topic in the context of adding some new OGRSQL-specific functionality to [{gpkg}](https://github.com/brownag/gpkg/) which would utilize {vapour} rather than {terra}. It does seem as if there may not currently be a package on CRAN that provides a modern (dbplyr >= 2.0.0), fully DBI-compatible interface tailored to the GDAL OGRSQL dialect. So, perhaps there is a space for a package like this, but it is also not entirely clear it is "needed". I will point out that much of the basic SQL evaluation/spatial queries etc. can be readily achieved with {sf}+{DBI} or {terra}.
-i
 
 After getting the basics minimally working, and thinking about pushing the repo up to GitHub, I realized that folks have tread in this space many years prior to me, namely: @mdsumner (https://github.com/mdsumner/RGDALSQL); and @etiennebr (https://github.com/r-spatial/sfdbi). These packages both appear to be excellent implementations, and mostly working, though they have not been updated recently, and there have been some further developments in the {dbplyr} space in the last several years.
 

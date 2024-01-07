@@ -9,7 +9,7 @@
 \arguments{
 \item{res}{A GDALOGRSQLResult Object}
 
-\item{n}{Number of records to fetch. Default \code{-1} for all records.}
+\item{n}{Number of records to fetch. Default \code{NULL} for all records.}
 
 \item{...}{Additional arguments}
 

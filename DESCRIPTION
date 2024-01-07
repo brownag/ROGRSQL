@@ -15,7 +15,6 @@ Roxygen: list(markdown = TRUE)
 Imports:
   DBI (>= 0.3.0),
   methods,
-  terra,
   dbplyr (>= 2.4.0),
   vapour,
   RSQLite
@@ -23,3 +22,4 @@ Suggests:
   DBItest,
   testthat (>= 3.0.0)
 Config/testthat/edition: 3
+URL: http://humus.rocks/ROGRSQL/

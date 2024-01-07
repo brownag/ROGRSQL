@@ -195,7 +195,7 @@ setMethod("dbClearResult", "GDALOGRSQLResult", function(res, ...) {
 })
 
 .validate_n <- function(n) {
-  if (!is.null(n) && n == Inf) {
+  if (!is.null(n) && (n == Inf || n == -1)) {
     n <- NULL
   }
 
@@ -208,7 +208,7 @@ setMethod("dbClearResult", "GDALOGRSQLResult", function(res, ...) {
 #' Retrieve records from OGRSQL query
 
 #' @param res A GDALOGRSQLResult Object
-#' @param n Number of records to fetch. Default `-1` for all records.
+#' @param n Number of records to fetch. Default `NULL` for all records.
 #' @param ... Additional arguments
 #' @param geom character. Either `"json"`, `"gml"`, `"kml"`, `"wkt"` (default) or `"hex"`
 #' @param fid logical. Keep feature ID? Default: `FALSE`
