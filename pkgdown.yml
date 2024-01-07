@@ -1,0 +1,9 @@
+pandoc: 2.19.2
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles: {}
+last_built: 2024-01-07T06:42Z
+urls:
+  reference: http://humus.rocks/ROGRSQL/reference
+  article: http://humus.rocks/ROGRSQL/articles
+
