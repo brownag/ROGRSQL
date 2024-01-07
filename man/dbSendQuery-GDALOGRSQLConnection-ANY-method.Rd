@@ -16,6 +16,3 @@
 \description{
 Send a query to GDALOGRSQLDriver
 }
-\examples{
-# This is another good place to put examples
-}

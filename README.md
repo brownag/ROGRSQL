@@ -113,8 +113,8 @@ db2 <- dbConnect(ROGRSQL::OGRSQL(), system.file("extdata", "lux.gpkg", package =
 # error with ST_Centroid
 tbl(db1, "lux") |> 
   group_by(NAME_1) |> 
-  filter(ID_2 %% ID_1 == 0) |> 
-  summarize(ST_Centroid(geom))
+  filter(ID_2 %% ID_1 == 0) |>
+  summarize(ST_Centroid(geom)) 
 #> Error in `collect()`:
 #> ! Failed to collect lazy table.
 #> Caused by error:
@@ -126,12 +126,21 @@ tbl(db2, "lux") |>
   filter(ID_2 %% ID_1 == 0) |> 
   ungroup() |> 
   summarize(ST_Centroid(geom)) -> res
-res
-#> Warning: Prior result set will be cleared
-#> Error in `collect()`:
-#> ! Failed to collect lazy table.
-#> Caused by error:
-#> ! unable to find an inherited method for function 'dbGetRowCount' for signature '"GDALOGRSQLResult"'
+
+res |> 
+  collect()
+#> Warning: Only first 8 results retrieved. Use n = Inf to retrieve all.
+#> # A tibble: 8 × 1
+#>   `ST_Centroid(geom)`                      
+#>   <chr>                                    
+#> 1 POINT (6.0090815315983 50.0706361949086) 
+#> 2 POINT (6.12742481671626 49.8661396602439)
+#> 3 POINT (5.88650246888354 49.8001378080874)
+#> 4 POINT (6.16508092561211 49.9288611138491)
+#> 5 POINT (5.91454519617064 49.9389181305846)
+#> 6 POINT (6.37844920946634 49.7851091638985)
+#> 7 POINT (6.34639476753763 49.6874179035032)
+#> 8 POINT (6.02381557605546 49.5233098534297)
 
 # inspect generated query
 show_query(res)

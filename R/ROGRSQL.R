@@ -115,12 +115,8 @@ setClass("GDALOGRSQLResult",
 #' @param statement An OGRSQL query to execute.
 #' @param ... Additional arguments
 #' @export
-#' @importFrom terra query vect
-#' @examples
-#' # This is another good place to put examples
 setMethod("dbSendQuery", "GDALOGRSQLConnection", function(conn, statement, ...) {
   i <- vapour::vapour_layer_info(conn@dsn, vapour::vapour_layer_names(conn@dsn)[1])
-
 
   if (!conn@ref$connected) {
     stop("GDALOGRSQLConnection is no longer connected")
@@ -138,7 +134,6 @@ setMethod("dbSendQuery", "GDALOGRSQLConnection", function(conn, statement, ...) 
   }
 
   if (!is.null(conn@ref$result)) {
-    warning("Prior result set will be cleared", call. = FALSE)
     dbClearResult(conn@ref$result)
     stopifnot(is.null(conn@ref$result))
   }
@@ -176,8 +171,13 @@ setMethod("dbGetQuery", c("GDALOGRSQLConnection", "character"),
   if (!is.null(x[["n"]])) {
     n <- .validate_n(x[["n"]])
   }
-  res <- dbSendQuery(conn, statement, ...)
-  dbFetch(res, n = n, geom = geom)
+  suppressWarnings({
+    res <- dbSendQuery(conn, statement, ...)
+    if (!is.null(n))
+      dbFetch(res, n = n, geom = geom)
+    else
+      dbFetch(res, n = NULL, geom = geom)
+  })
 })
 
 #' Clear Results
@@ -379,6 +379,18 @@ setMethod("dbColumnInfo", "GDALOGRSQLResult", function(res) {
 #' @export
 setMethod("dbGetRowsAffected", "GDALOGRSQLResult", function(res) {
   0
+})
+
+#' Get number of rows returned in a SELECT query
+#' @param res GDALOGRSQLResult
+#' @export
+setMethod("dbGetRowCount", "GDALOGRSQLResult", function(res) {
+ # TODO: was not originally needed, needed when n passed through to dbFetch
+ i <- suppressWarnings(as.numeric(gsub(".*LIMIT (\\d+)$", "\\1", as.character(res@sql))))
+ if (is.na(i) || !is.numeric(i)) {
+   return(length(vapour::vapour_read_fids(res@conn@dsn, res@lyr$layer, sql = res@sql)))
+ }
+ as.integer(i)
 })
 
 # dbBind() allows using parametrised queries. Take a look at sqlInterpolate() and sqlParseVariables() if your SQL engine doesn’t offer native parametrised queries.
