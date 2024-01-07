@@ -1,0 +1,25 @@
+Package: ROGRSQL
+Type: Package
+Title: Experimental DBI Backend for Geospatial Data Abstraction Library (GDAL) 'OGRSQL' Dialect
+Version: 0.0.1
+Author: Andrew G. Brown
+Maintainer: Andrew G. Brown <brown.andrewg@gmail.com>
+Description: Provides a basic DBI-compatible backend for the Geospatial Data Abstraction Library (GDAL) 'OGRSQL' dialect <https://gdal.org/user/ogr_sql_dialect.html>. This is suitable for integration of spatial queries and functionality into DBI-based tools, such as RStudio.
+    In contrast, these capabilities are not offered by 'RSQLite' package, which lacks the 'SpatiaLite' extension and ability to utilize special features of OGR SQL.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Language: en-US
+RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)
+Imports:
+  DBI (>= 0.3.0),
+  methods,
+  terra,
+  dbplyr (>= 2.4.0),
+  vapour,
+  RSQLite
+Suggests:
+  DBItest,
+  testthat (>= 3.0.0)
+Config/testthat/edition: 3
