@@ -218,6 +218,7 @@ setMethod("dbClearResult", "GDALOGRSQLResult", function(res, ...) {
 #' @param geom character. Either `"json"`, `"gml"`, `"kml"`, `"wkt"` (default) or `"hex"`
 #' @param fid logical. Keep feature ID? Default: `FALSE`
 #' @export
+#' @importFrom utils capture.output type.convert
 # dbFetch<GDALOGRSQLResult> ----
 setMethod("dbFetch", "GDALOGRSQLResult", function(res, n = NULL, ..., geom = "wkt", fid = FALSE) {
 
@@ -240,7 +241,7 @@ setMethod("dbFetch", "GDALOGRSQLResult", function(res, n = NULL, ..., geom = "wk
   gnm <- vapour::vapour_geom_name(src, layer = lyr, sql = sql)
 
   # vapour produces Rprintf output for extent-less results
-  capture.output({
+  utils::capture.output({
     lin <- vapour::vapour_layer_info(src, layer = lyr, sql = sql)
   })
 
@@ -304,7 +305,7 @@ setMethod("dbFetch", "GDALOGRSQLResult", function(res, n = NULL, ..., geom = "wk
   # protect raw values during conversion
   out.raw <- sapply(out, function(o) is.list(o) || is.raw(o) || bit64::is.integer64(o))
   out.raw[lin$fields == "OFTInteger64"] <- TRUE
-  out2 <- type.convert(out, as.is = TRUE)
+  out2 <- utils::type.convert(out, as.is = TRUE)
   out2[out.raw] <- out[out.raw]
 
   if (nzero) {
