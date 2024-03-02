@@ -280,6 +280,8 @@ setMethod("dbFetch", "GDALOGRSQLResult", function(res, n = NULL, ..., geom = "wk
     out$fid <- NULL
   }
 
+  out <- type.convert(out, as.is = TRUE)
+
   if (nzero) {
     return(out[0, , drop = FALSE])
   }

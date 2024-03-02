@@ -1,6 +1,6 @@
 test_that("ROGRSQL works", {
   tf <- system.file("extdata", "lux.gpkg", package = "ROGRSQL")
-  DBItest::make_context(new(
+  ctx <- DBItest::make_context(new(
     "DBIConnector",
     .drv = ROGRSQL::OGRSQL(),
     .conn_args = list(dsn = tf)
@@ -39,8 +39,8 @@ test_that("ROGRSQL works", {
                                 "execute_atomic",
                                 "execute_immediate",
                                 "data_type_create_table",
-                                "data_numeric",                        # TODO: numeric, logical returning as character?
-                                "data_logical",
+                                # "data_numeric",                      # UNION queries w/ NULL numeric return as character
+                                "data_logical",                        # TODO: logical returning as integer
                                 "data_character",
                                 "data_raw",
                                 "data_timestamp",                      # SQL statement fails
@@ -52,3 +52,11 @@ test_that("ROGRSQL works", {
                                 "data_64_bit_lossless")))
 })
 
+## additional simpler tests added to track incremental fixes
+test_that("data_numeric", {
+  path <- system.file("extdata", "lux.gpkg", package = "ROGRSQL")
+  db <- dbConnect(ROGRSQL::OGRSQL(), path)
+  x <- dbGetQuery(db, "SELECT NULL as a, NULL as b, 1 as id UNION SELECT 1.5 as a, -100.5 as b, 2 as id")
+  y <- dbGetQuery(db, "SELECT CAST(1 as boolean) AS a")
+  expect_true(is.numeric(x[[1]]) && is.numeric(x[[2]]))
+})
