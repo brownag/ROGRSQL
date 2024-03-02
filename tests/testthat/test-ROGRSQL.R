@@ -10,7 +10,13 @@ test_that("ROGRSQL works", {
   twk <- DBItest::tweaks(
     # does not support boolean
     logical_return = as.integer,
-    omit_blob_tests = TRUE
+    # some queries involving raw data fail to return raw
+    omit_blob_tests = TRUE,
+    # does not support typed date/time/timestamp/timestamp()
+    timestamp_cast = function(x) paste0("('", x, "')"),
+    time_typed = FALSE,
+    timestamp_typed = FALSE,
+    date_typed = FALSE
   )
 
   ctx <- DBItest::make_context(
@@ -56,11 +62,11 @@ test_that("ROGRSQL works", {
                                 # "data_logical",                      # logical returns as integer
                                 "data_character",
                                 # "data_raw",                          # UNION queries w/ NULL return NA
-                                "data_timestamp",                      # SQL statement fails
-                                "data_date_typed",
-                                "data_date_current_typed",
-                                "data_timestamp_typed",
-                                "data_timestamp_current_typed",
+                                # "data_timestamp",                    # timestamp() not supported
+                                # "data_date_typed",
+                                # "data_date_current_typed",
+                                # "data_timestamp_typed",
+                                # "data_timestamp_current_typed",
                                 "data_64_bit_numeric_warning",         # bigint handling/warning not supported yet
                                 "data_64_bit_lossless")))
 })
