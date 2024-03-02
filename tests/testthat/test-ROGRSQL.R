@@ -27,19 +27,15 @@ test_that("ROGRSQL works", {
 
   DBItest::test_getting_started()
 
-  # TODO: vapour returns bigint as double not integer,
-  #       numeric/character/int64 tests
-  #
-  #       bigint connection arg not (yet) supported
-  DBItest::test_driver(skip = c("connect_bigint_integer",   # integer should always return integer, NA on overflow
-                                "connect_bigint_numeric",   # numeric should work correctly
-                                "connect_bigint_character", # character should produce char equivalent of numeric
-                                "connect_bigint_integer64"  # integer64 should be castable to numeric/character
+  DBItest::test_driver(skip = c(# "connect_bigint_integer",   # integer should always return integer, NA on overflow
+                                # "connect_bigint_numeric",   # numeric should work correctly
+                                # "connect_bigint_character"#, # character should produce char equivalent of numeric
+                                # "connect_bigint_integer64"  # integer64 should be castable to numeric/character
                                 ))
 
   DBItest::test_connection()
 
-  expect_warning(DBItest::test_result(skip = c(
+  DBItest::test_result(skip = c(
                                 "send_query_only_one_result_set",      # does not need all of these limitations
                                 "fetch_no_return_value",               # CREATE TABLE fails
                                 "fetch_n_progressive",                 # progressive queries not supported yet
@@ -67,8 +63,9 @@ test_that("ROGRSQL works", {
                                 # "data_date_current_typed",
                                 # "data_timestamp_typed",
                                 # "data_timestamp_current_typed",
-                                "data_64_bit_numeric_warning",         # bigint handling/warning not supported yet
-                                "data_64_bit_lossless")))
+                                "data_64_bit_numeric_warning",         # numeric fallback warning not supported
+                                "data_64_bit_lossless"                 # lossless tests fail
+                                ))
 })
 
 ## additional simpler tests added to track incremental fixes
@@ -96,4 +93,21 @@ test_that("data_raw", {
   # this does not
   z2 <- dbGetQuery(db, "SELECT NULL as a, 1 as id UNION SELECT X'00' as a, 2 as id")
   expect_true(all(is.na(z2[[1]])))
+})
+
+test_that("bigint_integer", {
+  db <- dbConnect(ROGRSQL::OGRSQL(), path, bigint = "integer")
+  expect_true(is.na(dbGetQuery(db, "SELECT 10000000001")[1, 1]))
+})
+
+test_that("bigint_character", {
+  db <- dbConnect(ROGRSQL::OGRSQL(), path, bigint = "character")
+  expect_true(is.character(dbGetQuery(db, "SELECT 10000000000")[1, 1]))
+})
+
+test_that("bigint_integer64", {
+  if (requireNamespace("bit64")) {
+    db <- dbConnect(ROGRSQL::OGRSQL(), path, bigint = "integer64")
+    expect_true(bit64::is.integer64(dbGetQuery(db, "SELECT 10000000000")[1, 1]))
+  }
 })

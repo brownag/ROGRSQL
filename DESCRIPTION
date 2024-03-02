@@ -19,6 +19,7 @@ Imports:
   vapour,
   RSQLite
 Suggests:
+  bit64,
   DBItest,
   testthat (>= 3.0.0)
 Config/testthat/edition: 3

@@ -61,6 +61,7 @@ setMethod("dbUnloadDriver", "GDALOGRSQLDriver", function(drv, ...) {
 #'
 #' @param drv An object created by \code{OGRSQL())}
 #' @param dsn character. Path to OGR-compatible data source.
+#' @param bigint character. Return type for _OFTInteger64_ fields. One of: `"integer"`, `"character"`, `"numeric"`, `"integer64"` (default)
 #' @param ... Additional arguments
 #' @rdname OGRSQL
 #' @export
@@ -70,9 +71,10 @@ setMethod("dbUnloadDriver", "GDALOGRSQLDriver", function(drv, ...) {
 #' dbSendQuery(db, "SELECT * FROM mtcars WHERE cyl == 4")
 #' }
 # dbConnect<GDALOGRSQLDriver> ----
-setMethod("dbConnect", "GDALOGRSQLDriver", function(drv, dsn, ...) {
+setMethod("dbConnect", "GDALOGRSQLDriver", function(drv, dsn, bigint = "integer64", ...) {
   conn <- new("GDALOGRSQLConnection", dsn = dsn, ref = new.env(), ...)
   conn@ref$connected <- TRUE
+  conn@bigint <- match.arg(bigint, choices = c("integer", "character", "numeric", "integer64"))
   conn
 })
 
@@ -184,10 +186,12 @@ setMethod("dbGetQuery", c("GDALOGRSQLConnection", "character"),
   suppressWarnings({
     res <- dbSendQuery(conn, statement, ...)
     if (!is.null(n))
-      dbFetch(res, n = n, geom = geom)
+      out <- dbFetch(res, n = n, geom = geom)
     else
-      dbFetch(res, n = NULL, geom = geom)
+      out <- dbFetch(res, n = NULL, geom = geom)
   })
+  dbClearResult(res)
+  out
 })
 
 #' Clear Results
@@ -252,6 +256,27 @@ setMethod("dbFetch", "GDALOGRSQLResult", function(res, n = NULL, ..., geom = "wk
 
   f <- vapour::vapour_read_fields(src, layer = lyr, sql = sql, limit_n = n)
 
+  nf <- names(f)
+  f <- lapply(seq(f), function(i) {
+    if (res@conn@bigint %in% c("character", "integer64") &&
+        lin$fields[i] == "OFTInteger64" &&
+        any(abs(f[[i]]) > .Machine$integer.max / 2)) {
+      if (!requireNamespace("bit64"))
+        stop("package 'bit64' is required for connections with bigint='integer64' or bigint='character'", call. = FALSE)
+      f2 <- bit64::as.integer64(f[[i]])
+      if (res@conn@bigint == "character") {
+        as.character(f2)
+      } else {
+        f2
+      }
+    } else {
+      switch(res@conn@bigint,
+             `integer` = as.integer(f[[i]]),
+             f[[i]])
+    }
+  })
+  names(f) <- nf
+
   # TODO: binary geometry
   if (tolower(trimws(geom)) %in% c("json", "gml", "kml", "wkt")) {
    g <- vapour::vapour_read_geometry_text(src, layer = lyr, sql = sql, textformat = geom, limit_n = n)
@@ -277,7 +302,8 @@ setMethod("dbFetch", "GDALOGRSQLResult", function(res, n = NULL, ..., geom = "wk
   }
 
   # protect raw values during conversion
-  out.raw <- sapply(out, function(o) is.list(o) || is.raw(o))
+  out.raw <- sapply(out, function(o) is.list(o) || is.raw(o) || bit64::is.integer64(o))
+  out.raw[lin$fields == "OFTInteger64"] <- TRUE
   out2 <- type.convert(out, as.is = TRUE)
   out2[out.raw] <- out[out.raw]
 
