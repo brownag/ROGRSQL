@@ -1,10 +1,22 @@
 test_that("ROGRSQL works", {
   tf <- system.file("extdata", "lux.gpkg", package = "ROGRSQL")
-  ctx <- DBItest::make_context(new(
+
+  dbic <- new(
     "DBIConnector",
     .drv = ROGRSQL::OGRSQL(),
     .conn_args = list(dsn = tf)
-  ), NULL)
+  )
+
+  twk <- DBItest::tweaks(
+    # https://gdal.org/api/vector_c_api.html#_CPPv412OGRFieldType does not support boolean
+    logical_return = as.integer
+  )
+
+  ctx <- DBItest::make_context(
+    dbic,
+    NULL,
+    tweaks = twk
+  )
 
   DBItest::test_getting_started()
 
@@ -40,7 +52,7 @@ test_that("ROGRSQL works", {
                                 "execute_immediate",
                                 "data_type_create_table",
                                 # "data_numeric",                      # UNION queries w/ NULL numeric return as character
-                                "data_logical",                        # TODO: logical returning as integer
+                                # "data_logical",                      # logical returns as integer
                                 "data_character",
                                 "data_raw",
                                 "data_timestamp",                      # SQL statement fails
