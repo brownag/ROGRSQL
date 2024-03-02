@@ -267,25 +267,24 @@ setMethod("dbFetch", "GDALOGRSQLResult", function(res, n = NULL, ..., geom = "wk
   }
 
   if (length(f) > 0) {
-    for (i in seq(f)) {
-      if (is.list(f[[i]])) {
-        f[[i]] <- I(f[[i]])
-      }
-      fff <- data.frame(f[[i]])
-      colnames(fff) <- names(f[i])
-      out <- cbind(out, fff)
-    }
+   fff <- as.data.frame(f)
+   colnames(fff) <- names(f)
+   out <- cbind(out, fff)
   }
+
   if (!fid) {
     out$fid <- NULL
   }
 
-  out <- type.convert(out, as.is = TRUE)
+  # protect raw values during conversion
+  out.raw <- sapply(out, function(o) is.list(o) || is.raw(o))
+  out2 <- type.convert(out, as.is = TRUE)
+  out2[out.raw] <- out[out.raw]
 
   if (nzero) {
-    return(out[0, , drop = FALSE])
+    return(out2[0, , drop = FALSE])
   }
-  out
+  out2
 })
 
 #' Find the database data type associated with an R object

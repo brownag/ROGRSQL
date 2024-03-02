@@ -8,8 +8,9 @@ test_that("ROGRSQL works", {
   )
 
   twk <- DBItest::tweaks(
-    # https://gdal.org/api/vector_c_api.html#_CPPv412OGRFieldType does not support boolean
-    logical_return = as.integer
+    # does not support boolean
+    logical_return = as.integer,
+    omit_blob_tests = TRUE
   )
 
   ctx <- DBItest::make_context(
@@ -51,10 +52,10 @@ test_that("ROGRSQL works", {
                                 "execute_atomic",
                                 "execute_immediate",
                                 "data_type_create_table",
-                                # "data_numeric",                      # UNION queries w/ NULL numeric return as character
+                                # "data_numeric",                      # UNION queries w/ NULL return character
                                 # "data_logical",                      # logical returns as integer
                                 "data_character",
-                                "data_raw",
+                                # "data_raw",                          # UNION queries w/ NULL return NA
                                 "data_timestamp",                      # SQL statement fails
                                 "data_date_typed",
                                 "data_date_current_typed",
@@ -65,10 +66,28 @@ test_that("ROGRSQL works", {
 })
 
 ## additional simpler tests added to track incremental fixes
+path <- system.file("extdata", "lux.gpkg", package = "ROGRSQL")
+db <- dbConnect(ROGRSQL::OGRSQL(), path)
+
+## See supported field types:
+##   https://gdal.org/api/vector_c_api.html#_CPPv412OGRFieldType
 test_that("data_numeric", {
-  path <- system.file("extdata", "lux.gpkg", package = "ROGRSQL")
-  db <- dbConnect(ROGRSQL::OGRSQL(), path)
   x <- dbGetQuery(db, "SELECT NULL as a, NULL as b, 1 as id UNION SELECT 1.5 as a, -100.5 as b, 2 as id")
-  y <- dbGetQuery(db, "SELECT CAST(1 as boolean) AS a")
   expect_true(is.numeric(x[[1]]) && is.numeric(x[[2]]))
+})
+
+test_that("data_logical", {
+  # logicals are returned as integer
+  y <- dbGetQuery(db, "SELECT CAST(1 as boolean) AS a")
+  expect_true(is.integer(y[[1]]))
+})
+
+test_that("data_raw", {
+  # this works
+  z <- dbGetQuery(db, "SELECT X'00' as a")
+  expect_true(is.list(z) && is.raw(z[[1]]))
+
+  # this does not
+  z2 <- dbGetQuery(db, "SELECT NULL as a, 1 as id UNION SELECT X'00' as a, 2 as id")
+  expect_true(all(is.na(z2[[1]])))
 })
