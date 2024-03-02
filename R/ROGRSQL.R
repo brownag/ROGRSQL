@@ -233,7 +233,21 @@ setMethod("dbFetch", "GDALOGRSQLResult", function(res, n = NULL, ..., geom = "wk
   # TODO: more than one geometry in result?
   gnm <- vapour::vapour_geom_name(src, layer = lyr, sql = sql)
 
-  # TODO: bigint?
+  # vapour produces Rprintf output for extent-less results
+  capture.output({
+    lin <- vapour::vapour_layer_info(src, layer = lyr, sql = sql)
+  })
+
+  if (!is.null(n) && n > lin$count) {
+    n <- lin$count
+  }
+
+  nzero <- FALSE
+  if (!is.null(n) && n == 0) {
+    n <- 1
+    nzero <- TRUE
+  }
+
   f <- vapour::vapour_read_fields(src, layer = lyr, sql = sql, limit_n = n)
 
   # TODO: binary geometry
@@ -262,6 +276,10 @@ setMethod("dbFetch", "GDALOGRSQLResult", function(res, n = NULL, ..., geom = "wk
   }
   if (!fid) {
     out$fid <- NULL
+  }
+
+  if (nzero) {
+    return(out[0, , drop = FALSE])
   }
   out
 })
