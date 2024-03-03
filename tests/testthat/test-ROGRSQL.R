@@ -90,7 +90,7 @@ test_that("data_logical", {
 test_that("data_raw", {
   # this works
   z <- dbGetQuery(db, "SELECT X'00' as a")
-  expect_true(is.list(z) && is.raw(z[[1]]))
+  expect_true(is.list(z) && is.list(z[[1]]) && is.raw(z[[1]][[1]]))
 
   # this does not
   z2 <- dbGetQuery(db, "SELECT NULL as a, 1 as id UNION SELECT X'00' as a, 2 as id")
