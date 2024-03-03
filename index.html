@@ -94,9 +94,9 @@
 <h1 id="rstudio-interface-and-rmarkdown">RStudio Interface and RMarkdown<a class="anchor" aria-label="anchor" href="#rstudio-interface-and-rmarkdown"></a>
 </h1>
 <p>You can use the <code><a href="reference/OGRSQL.html">OGRSQL()</a></code> DBI driver to dynamically preview your results in the RStudio SQL editor. This simply requires using a special comment at the top of your SQL script, like so:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- !preview connection=DBI::dbConnect(ROGRSQL::OGRSQL(), system.file("extdata", "lux.gpkg", package = "ROGRSQL"))</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> ST_Centroid(geom) <span class="kw">FROM</span> lux <span class="kw">LIMIT</span> <span class="dv">1</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co">-- !preview connection=DBI::dbConnect(ROGRSQL::OGRSQL(), system.file("extdata", "lux.gpkg", package = "ROGRSQL"))</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="kw">SELECT</span> ST_Centroid(geom) <span class="kw">FROM</span> lux <span class="kw">LIMIT</span> <span class="dv">1</span>;</span></code></pre></div>
 <div class="knitsql-table">
 <table class="table">
 <thead><tr class="header">

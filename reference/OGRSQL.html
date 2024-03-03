@@ -45,7 +45,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">OGRSQL</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for GDALOGRSQLDriver</span></span>
-<span><span class="fu">dbConnect</span><span class="op">(</span><span class="va">drv</span>, <span class="va">dsn</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">dbConnect</span><span class="op">(</span><span class="va">drv</span>, <span class="va">dsn</span>, bigint <span class="op">=</span> <span class="st">"integer64"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -56,6 +56,10 @@
 
 <dt>dsn</dt>
 <dd><p>character. Path to OGR-compatible data source.</p></dd>
+
+
+<dt>bigint</dt>
+<dd><p>character. Return type for <em>OFTInteger64</em> fields. One of: <code>"integer"</code>, <code>"character"</code>, <code>"numeric"</code>, <code>"integer64"</code> (default)</p></dd>
 
 
 <dt>...</dt>
