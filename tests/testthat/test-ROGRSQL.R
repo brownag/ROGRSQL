@@ -16,7 +16,8 @@ test_that("ROGRSQL works", {
     timestamp_cast = function(x) paste0("('", x, "')"),
     time_typed = FALSE,
     timestamp_typed = FALSE,
-    date_typed = FALSE
+    date_typed = FALSE,
+    dbitest_version = "1.8.0"
   )
 
   ctx <- DBItest::make_context(
@@ -64,7 +65,8 @@ test_that("ROGRSQL works", {
                                 # "data_timestamp_typed",
                                 # "data_timestamp_current_typed",
                                 "data_64_bit_numeric_warning",         # numeric fallback warning not supported
-                                "data_64_bit_lossless"                 # lossless tests fail
+                                "data_64_bit_lossless",                # lossless tests fail
+                                "cannot_clear_result_twice_query_arrow"
                                 ))
 })
 

@@ -450,7 +450,7 @@ setMethod("dbGetRowCount", "GDALOGRSQLResult", function(res) {
 
 
 .validate_n <- function(n) {
-  if (!is.null(n) && (n == Inf || n == -1)) {
+  if ((!is.null(n) && (is.na(n) || n == Inf || n == -1))) {
     n <- NULL
   }
 
