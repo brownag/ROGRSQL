@@ -405,7 +405,7 @@ setMethod("dbIsValid", "GDALOGRSQLConnection", function(dbObj, ...) {
 #' @export
 # dbIsValid<GDALOGRSQLResult> ----
 setMethod("dbIsValid", "GDALOGRSQLResult", function(dbObj, ...) {
-  is.null(dbObj@conn@ref$result)
+  !is.null(dbObj@conn@ref$result)
 })
 
 #' Get the issued query as a character value
