@@ -113,3 +113,17 @@ test_that("bigint_integer64", {
     expect_true(bit64::is.integer64(dbGetQuery(db, "SELECT 10000000000")[1, 1]))
   }
 })
+
+test_that("dbColumnInfo", {
+  db <- dbConnect(ROGRSQL::OGRSQL(), path, bigint = "character")
+  res <- dbSendQuery(db, "SELECT 10000000000")
+  expect_equal(dbColumnInfo(res)[7, 2], "character")
+  dbClearResult(res)
+  dbDisconnect(db)
+
+  db <- dbConnect(ROGRSQL::OGRSQL(), path, bigint = "integer64")
+  res <- dbSendQuery(db, "SELECT 10000000000")
+  expect_equal(dbColumnInfo(res)[7, 2], "integer64")
+  dbClearResult(res)
+  dbDisconnect(db)
+})

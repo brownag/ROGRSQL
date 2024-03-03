@@ -427,7 +427,8 @@ setMethod("dbColumnInfo", "GDALOGRSQLResult", function(res) {
   geom <- data.frame(name = g,
                      type = rep("list", length(g)))
   rbind(fid, geom, data.frame(name = names(res@lyr$fields),
-                              type = .remap_types(as.character(res@lyr$fields))))
+                              type = .remap_types(res@conn,
+                                                  as.character(res@lyr$fields))))
 })
 
 #' Get number of rows altered in a INSERT/UPDATE query
@@ -465,9 +466,13 @@ setMethod("dbGetRowCount", "GDALOGRSQLResult", function(res) {
   n
 }
 
-.remap_types <- function(x) {
-  y <- c("double", "character", "integer")
-  names(y) <- c("OFTReal", "OFTString", "OFTInteger64")
+.remap_types <- function(conn, x) {
+  y <- c("double", "character", "integer",
+         conn@bigint, "raw", "character",
+         "character", "character")
+  names(y) <- c("OFTReal", "OFTString", "OFTInteger",
+                "OFTInteger64", "OFTBinary", "OFTDate",
+                "OFTTime", "OFTDatetime")
   y[x]
 }
 
