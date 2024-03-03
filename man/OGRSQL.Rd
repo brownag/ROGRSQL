@@ -7,12 +7,14 @@
 \usage{
 OGRSQL()
 
-\S4method{dbConnect}{GDALOGRSQLDriver}(drv, dsn, ...)
+\S4method{dbConnect}{GDALOGRSQLDriver}(drv, dsn, bigint = "integer64", ...)
 }
 \arguments{
 \item{drv}{An object created by \code{OGRSQL())}}
 
 \item{dsn}{character. Path to OGR-compatible data source.}
+
+\item{bigint}{character. Return type for \emph{OFTInteger64} fields. One of: \code{"integer"}, \code{"character"}, \code{"numeric"}, \code{"integer64"} (default)}
 
 \item{...}{Additional arguments}
 }
