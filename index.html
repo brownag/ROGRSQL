@@ -5,16 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="Provides a basic DBI-compatible backend for the Geospatial Data Abstraction Library (GDAL) OGRSQL dialect &lt;https://gdal.org/user/ogr_sql_dialect.html&gt;. This is suitable for integration of spatial queries and functionality into DBI-based tools, such as RStudio.
-    In contrast, these capabilities are not offered by RSQLite package, which lacks the SpatiaLite extension and ability to utilize special features of OGR SQL.">
+<meta name="description" content="Provides a basic DBI-compatible backend for the Geospatial Data Abstraction Library (GDAL) OGRSQL dialect &lt;https://gdal.org/user/ogr_sql_dialect.html&gt;. This is suitable for integration of spatial queries and functionality into DBI-based tools, such as RStudio. In contrast, these capabilities are not offered by RSQLite package, which lacks the SpatiaLite extension and ability to utilize special features of OGR SQL.">
 <title>Experimental DBI Backend for Geospatial Data Abstraction Library (GDAL) OGRSQL Dialect • ROGRSQL</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Experimental DBI Backend for Geospatial Data Abstraction Library (GDAL) OGRSQL Dialect">
-<meta property="og:description" content="Provides a basic DBI-compatible backend for the Geospatial Data Abstraction Library (GDAL) OGRSQL dialect &lt;https://gdal.org/user/ogr_sql_dialect.html&gt;. This is suitable for integration of spatial queries and functionality into DBI-based tools, such as RStudio.
-    In contrast, these capabilities are not offered by RSQLite package, which lacks the SpatiaLite extension and ability to utilize special features of OGR SQL.">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Experimental DBI Backend for Geospatial Data Abstraction Library (GDAL) OGRSQL Dialect">
+<meta property="og:description" content="Provides a basic DBI-compatible backend for the Geospatial Data Abstraction Library (GDAL) OGRSQL dialect &lt;https://gdal.org/user/ogr_sql_dialect.html&gt;. This is suitable for integration of spatial queries and functionality into DBI-based tools, such as RStudio. In contrast, these capabilities are not offered by RSQLite package, which lacks the SpatiaLite extension and ability to utilize special features of OGR SQL.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -24,11 +22,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
     
     <a class="navbar-brand me-2" href="index.html">ROGRSQL</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +71,7 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://humus.rocks/ROGRSQL/">ROGRSQL</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"lux.gpkg"</span>, package <span class="op">=</span> <span class="st">"ROGRSQL"</span><span class="op">)</span></span>
+<span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sample_gpkg_path.html">sample_gpkg_path</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu">dbConnect</span><span class="op">(</span><span class="fu">ROGRSQL</span><span class="fu">::</span><span class="fu"><a href="reference/OGRSQL.html">OGRSQL</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">path</span><span class="op">)</span></span>
 <span><span class="fu">dbGetQuery</span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT ST_Centroid(geom) FROM lux LIMIT 2"</span><span class="op">)</span></span>
@@ -94,7 +92,7 @@
 <h1 id="rstudio-interface-and-rmarkdown">RStudio Interface and RMarkdown<a class="anchor" aria-label="anchor" href="#rstudio-interface-and-rmarkdown"></a>
 </h1>
 <p>You can use the <code><a href="reference/OGRSQL.html">OGRSQL()</a></code> DBI driver to dynamically preview your results in the RStudio SQL editor. This simply requires using a special comment at the top of your SQL script, like so:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co">-- !preview connection=DBI::dbConnect(ROGRSQL::OGRSQL(), system.file("extdata", "lux.gpkg", package = "ROGRSQL"))</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co">-- !preview conn=DBI::dbConnect(ROGRSQL::OGRSQL(), ROGRSQL::sample_gpkg_path())</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="kw">SELECT</span> ST_Centroid(geom) <span class="kw">FROM</span> lux <span class="kw">LIMIT</span> <span class="dv">1</span>;</span></code></pre></div>
 <div class="knitsql-table">
@@ -131,8 +129,9 @@
 <span><span class="co">#&gt; Error in `collect()`:</span></span>
 <span><span class="co">#&gt; ! Failed to collect lazy table.</span></span>
 <span><span class="co">#&gt; Caused by error:</span></span>
-<span><span class="co">#&gt; ! no such function: ST_Centroid</span></span>
-<span></span>
+<span><span class="co">#&gt; ! no such function: ST_Centroid</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># works</span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span><span class="va">db2</span>, <span class="st">"lux"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">NAME_1</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
@@ -142,25 +141,21 @@
 <span></span>
 <span><span class="va">res</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Only first 8 results retrieved. Use n = Inf to retrieve all.</span></span>
-<span><span class="co">#&gt; # A tibble: 8 × 1</span></span>
-<span><span class="co">#&gt;   `ST_Centroid(geom)`                      </span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;                                    </span></span>
-<span><span class="co">#&gt; 1 POINT (6.0090815315983 50.0706361949086) </span></span>
-<span><span class="co">#&gt; 2 POINT (6.12742481671626 49.8661396602439)</span></span>
-<span><span class="co">#&gt; 3 POINT (5.88650246888354 49.8001378080874)</span></span>
-<span><span class="co">#&gt; 4 POINT (6.16508092561211 49.9288611138491)</span></span>
-<span><span class="co">#&gt; 5 POINT (5.91454519617064 49.9389181305846)</span></span>
-<span><span class="co">#&gt; 6 POINT (6.37844920946634 49.7851091638985)</span></span>
-<span><span class="co">#&gt; 7 POINT (6.34639476753763 49.6874179035032)</span></span>
-<span><span class="co">#&gt; 8 POINT (6.02381557605546 49.5233098534297)</span></span>
-<span></span>
+<span><span class="co">#&gt; Note: method with signature 'GDALOGRSQLConnection#character' chosen for function 'dbQuoteIdentifier',</span></span>
+<span><span class="co">#&gt;  target signature 'GDALOGRSQLConnection#SQL'.</span></span>
+<span><span class="co">#&gt;  "DBIConnection#SQL" would also be valid</span></span>
+<span><span class="co">#&gt; Error in `collect()`:</span></span>
+<span><span class="co">#&gt; ! Failed to collect lazy table.</span></span>
+<span><span class="co">#&gt; Caused by error in `dbSendQuery()`:</span></span>
+<span><span class="co">#&gt; ! Error in eval(expr, envir, enclos) : SQL execution failed.</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># inspect generated query</span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; SELECT ST_Centroid(`geom`) AS `ST_Centroid(geom)`</span></span>
 <span><span class="co">#&gt; FROM (</span></span>
-<span><span class="co">#&gt;   SELECT `lux`.*</span></span>
+<span><span class="co">#&gt;   SELECT `lux`.`*`</span></span>
 <span><span class="co">#&gt;   FROM `lux`</span></span>
 <span><span class="co">#&gt;   WHERE ((`ID_2` % `ID_1`) = 0.0)</span></span>
 <span><span class="co">#&gt; ) `q01`</span></span></code></pre></div>
@@ -211,13 +206,11 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p>
-<p>Developed by Andrew G. Brown.</p>
+  <p>Developed by Andrew G. Brown.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
     </footer>
