@@ -36,7 +36,7 @@ as the data source which is queried using GDAL OGRSQL.
 ``` r
 library(ROGRSQL)
 
-path <- system.file("extdata", "lux.gpkg", package = "ROGRSQL")
+path <- sample_gpkg_path()
 
 db <- dbConnect(ROGRSQL::OGRSQL(), path)
 dbGetQuery(db, "SELECT ST_Centroid(geom) FROM lux LIMIT 2")
@@ -68,7 +68,7 @@ results in the RStudio SQL editor. This simply requires using a special
 comment at the top of your SQL script, like so:
 
 ``` sql
--- !preview connection=DBI::dbConnect(ROGRSQL::OGRSQL(), system.file("extdata", "lux.gpkg", package = "ROGRSQL"))
+-- !preview conn=DBI::dbConnect(ROGRSQL::OGRSQL(), ROGRSQL::sample_gpkg_path())
 
 SELECT ST_Centroid(geom) FROM lux LIMIT 1;
 ```
@@ -119,6 +119,9 @@ tbl(db1, "lux") |>
 #> ! Failed to collect lazy table.
 #> Caused by error:
 #> ! no such function: ST_Centroid
+```
+
+``` r
 
 # works
 tbl(db2, "lux") |> 
@@ -129,25 +132,23 @@ tbl(db2, "lux") |>
 
 res |> 
   collect()
-#> Warning: Only first 8 results retrieved. Use n = Inf to retrieve all.
-#> # A tibble: 8 × 1
-#>   `ST_Centroid(geom)`                      
-#>   <chr>                                    
-#> 1 POINT (6.0090815315983 50.0706361949086) 
-#> 2 POINT (6.12742481671626 49.8661396602439)
-#> 3 POINT (5.88650246888354 49.8001378080874)
-#> 4 POINT (6.16508092561211 49.9288611138491)
-#> 5 POINT (5.91454519617064 49.9389181305846)
-#> 6 POINT (6.37844920946634 49.7851091638985)
-#> 7 POINT (6.34639476753763 49.6874179035032)
-#> 8 POINT (6.02381557605546 49.5233098534297)
+#> Note: method with signature 'GDALOGRSQLConnection#character' chosen for function 'dbQuoteIdentifier',
+#>  target signature 'GDALOGRSQLConnection#SQL'.
+#>  "DBIConnection#SQL" would also be valid
+#> Error in `collect()`:
+#> ! Failed to collect lazy table.
+#> Caused by error in `dbSendQuery()`:
+#> ! Error in eval(expr, envir, enclos) : SQL execution failed.
+```
+
+``` r
 
 # inspect generated query
 show_query(res)
 #> <SQL>
 #> SELECT ST_Centroid(`geom`) AS `ST_Centroid(geom)`
 #> FROM (
-#>   SELECT `lux`.*
+#>   SELECT `lux`.`*`
 #>   FROM `lux`
 #>   WHERE ((`ID_2` % `ID_1`) = 0.0)
 #> ) `q01`

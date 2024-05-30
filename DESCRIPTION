@@ -1,7 +1,7 @@
 Package: ROGRSQL
 Type: Package
 Title: Experimental DBI Backend for Geospatial Data Abstraction Library (GDAL) 'OGRSQL' Dialect
-Version: 0.0.1
+Version: 0.0.2
 Author: Andrew G. Brown
 Maintainer: Andrew G. Brown <brown.andrewg@gmail.com>
 Description: Provides a basic DBI-compatible backend for the Geospatial Data Abstraction Library (GDAL) 'OGRSQL' dialect <https://gdal.org/user/ogr_sql_dialect.html>. This is suitable for integration of spatial queries and functionality into DBI-based tools, such as RStudio.

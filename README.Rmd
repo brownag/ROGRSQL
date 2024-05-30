@@ -40,7 +40,7 @@ The shapefile is written to a new GeoPackage, and the GeoPackage is used as the 
 ```{r example-r}
 library(ROGRSQL)
 
-path <- system.file("extdata", "lux.gpkg", package = "ROGRSQL")
+path <- sample_gpkg_path()
 
 db <- dbConnect(ROGRSQL::OGRSQL(), path)
 dbGetQuery(db, "SELECT ST_Centroid(geom) FROM lux LIMIT 2")
@@ -60,13 +60,13 @@ Note that in above case two geometry columns are calculated in the result, but o
 You can use the `OGRSQL()` DBI driver to dynamically preview your results in the RStudio SQL editor. This simply requires using a special comment at the top of your SQL script, like so:
 
 ```{sql example-sql, eval=FALSE}
--- !preview connection=DBI::dbConnect(ROGRSQL::OGRSQL(), system.file("extdata", "lux.gpkg", package = "ROGRSQL"))
+-- !preview conn=DBI::dbConnect(ROGRSQL::OGRSQL(), ROGRSQL::sample_gpkg_path())
 
 SELECT ST_Centroid(geom) FROM lux LIMIT 1;
 ```
 
 ```{sql example-sql2, eval=TRUE, echo=FALSE}
---| connection=DBI::dbConnect(ROGRSQL::OGRSQL(), system.file("extdata", "lux.gpkg", package = "ROGRSQL"))
+--| connection=DBI::dbConnect(ROGRSQL::OGRSQL(), ROGRSQL::sample_gpkg_path())
 
 SELECT ST_Centroid(geom) FROM lux LIMIT 1;
 ```

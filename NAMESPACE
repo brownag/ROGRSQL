@@ -2,6 +2,7 @@
 
 S3method(dbplyr_edition,GDALOGRSQLConnection)
 export(OGRSQL)
+export(sample_gpkg_path)
 exportClasses(GDALOGRSQLConnection)
 exportClasses(GDALOGRSQLDriver)
 exportClasses(GDALOGRSQLResult)

@@ -487,3 +487,17 @@ setMethod("dbGetRowCount", "GDALOGRSQLResult", function(res) {
   val <- withCallingHandlers(expr, warning = wHandler)
   list(value = val, warnings = myWarnings)
 }
+
+#' Sample 'Luxembourg' Geopackage
+#'
+#' This is a Geopackage file created from the `"lux.shp"` test dataset in the `{terra}` R package.
+#'
+#' @return character. Path to ROGRSQL package `"extdata"` folder `"lux.gpkg"` file.
+#' @references Hijmans R (2024). _terra: Spatial Data Analysis_. R package version 1.7-78, https://rspatial.github.io/terra/, <https://rspatial.org/>.
+#'
+#' @export
+#' @examples
+#' sample_gpkg_path()
+sample_gpkg_path <- function() {
+  system.file("extdata", "lux.gpkg", package = "ROGRSQL")
+}
