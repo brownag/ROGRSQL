@@ -358,7 +358,7 @@ setMethod("dbQuoteIdentifier", c("GDALOGRSQLConnection", "character"), function(
   if (length(x) == 0L) {
     DBI::SQL(character(), names = names(x))
   } else {
-    DBI::SQL(paste("`", x, "`", sep = ""), names = names(x))
+    DBI::SQL(ifelse(x == "*", x, paste("`", x, "`", sep = "")), names = names(x))
   }
 })
 

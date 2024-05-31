@@ -72,7 +72,7 @@ SELECT ST_Centroid(geom) FROM lux LIMIT 1;
 ```
 
 In an {rmarkdown} code chunk, you can similarly do:
- `--| connection=DBI::dbConnect(ROGRSQL::OGRSQL(),  "inst/extdata/lux.gpkg")`.
+ `--| connection=DBI::dbConnect(ROGRSQL::OGRSQL(), ROGRSQL::sample_gpkg_path())`.
 
 # Constructing OGRSQL Queries with {dbplyr}
 
@@ -96,9 +96,9 @@ tbl(db1, "lux") |>
 
 # works
 tbl(db2, "lux") |> 
-  group_by(NAME_1) |>  
-  filter(ID_2 %% ID_1 == 0) |> 
-  ungroup() |> 
+  group_by(NAME_1) |>
+  filter(ID_2 %% ID_1 == 0) |>
+  ungroup() |>
   summarize(ST_Centroid(geom)) -> res
 
 res |> 
