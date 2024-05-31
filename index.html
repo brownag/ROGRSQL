@@ -106,7 +106,7 @@
 </table>
 <p>1 records</p>
 </div>
-<p>In an {rmarkdown} code chunk, you can similarly do: <code>--| connection=DBI::dbConnect(ROGRSQL::OGRSQL(),  "inst/extdata/lux.gpkg")</code>.</p>
+<p>In an {rmarkdown} code chunk, you can similarly do: <code>--| connection=DBI::dbConnect(ROGRSQL::OGRSQL(), ROGRSQL::sample_gpkg_path())</code>.</p>
 </div>
 <div class="section level1">
 <h1 id="constructing-ogrsql-queries-with-dbplyr">Constructing OGRSQL Queries with {dbplyr}<a class="anchor" aria-label="anchor" href="#constructing-ogrsql-queries-with-dbplyr"></a>
@@ -134,9 +134,9 @@
 <code class="sourceCode R"><span></span>
 <span><span class="co"># works</span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span><span class="va">db2</span>, <span class="st">"lux"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">NAME_1</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">ID_2</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="va">ID_1</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">NAME_1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">ID_2</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="va">ID_1</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span><span class="fu">ST_Centroid</span><span class="op">(</span><span class="va">geom</span><span class="op">)</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">res</span></span>
 <span></span>
 <span><span class="va">res</span> <span class="op">|&gt;</span> </span>
@@ -144,10 +144,18 @@
 <span><span class="co">#&gt; Note: method with signature 'GDALOGRSQLConnection#character' chosen for function 'dbQuoteIdentifier',</span></span>
 <span><span class="co">#&gt;  target signature 'GDALOGRSQLConnection#SQL'.</span></span>
 <span><span class="co">#&gt;  "DBIConnection#SQL" would also be valid</span></span>
-<span><span class="co">#&gt; Error in `collect()`:</span></span>
-<span><span class="co">#&gt; ! Failed to collect lazy table.</span></span>
-<span><span class="co">#&gt; Caused by error in `dbSendQuery()`:</span></span>
-<span><span class="co">#&gt; ! Error in eval(expr, envir, enclos) : SQL execution failed.</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Only first 8 results retrieved. Use n = Inf to retrieve all.</span></span>
+<span><span class="co">#&gt; # A tibble: 8 × 1</span></span>
+<span><span class="co">#&gt;   `ST_Centroid(geom)`                      </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                                    </span></span>
+<span><span class="co">#&gt; 1 POINT (6.0090815315983 50.0706361949086) </span></span>
+<span><span class="co">#&gt; 2 POINT (6.12742481671626 49.8661396602439)</span></span>
+<span><span class="co">#&gt; 3 POINT (5.88650246888354 49.8001378080874)</span></span>
+<span><span class="co">#&gt; 4 POINT (6.16508092561211 49.9288611138491)</span></span>
+<span><span class="co">#&gt; 5 POINT (5.91454519617064 49.9389181305846)</span></span>
+<span><span class="co">#&gt; 6 POINT (6.37844920946634 49.7851091638985)</span></span>
+<span><span class="co">#&gt; 7 POINT (6.34639476753763 49.6874179035032)</span></span>
+<span><span class="co">#&gt; 8 POINT (6.02381557605546 49.5233098534297)</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># inspect generated query</span></span>
@@ -155,7 +163,7 @@
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; SELECT ST_Centroid(`geom`) AS `ST_Centroid(geom)`</span></span>
 <span><span class="co">#&gt; FROM (</span></span>
-<span><span class="co">#&gt;   SELECT `lux`.`*`</span></span>
+<span><span class="co">#&gt;   SELECT `lux`.*</span></span>
 <span><span class="co">#&gt;   FROM `lux`</span></span>
 <span><span class="co">#&gt;   WHERE ((`ID_2` % `ID_1`) = 0.0)</span></span>
 <span><span class="co">#&gt; ) `q01`</span></span></code></pre></div>
